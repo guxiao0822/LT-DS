@@ -25,8 +25,8 @@ def get_loss(labels, num, cfg=None):
         if cfg.LOSS.TYPE == 'CE':
             loss_f.append(CE(labels[i], num))
 
-        if cfg.LOSS.TYPE == 'BLSM':
-            loss_f.append(BLSM(labels[i], num))
+        if cfg.LOSS.TYPE == 'BSCE':
+            loss_f.append(BSCE(labels[i], num))
 
         if cfg.LOSS.TYPE == 'SEQL':
             loss_f.append(SEQL(labels[i], num, cfg))
@@ -45,9 +45,9 @@ class CE(nn.Module):
 
         return loss
 
-class BLSM(CE):
+class BSCE(CE):
     def __init__(self, labels, num):
-        super(BLSM, self).__init__(labels, num)
+        super(BSCE, self).__init__(labels, num)
         self.bsce_weight = torch.FloatTensor(self.num_cls_list).cuda()
 
     def forward(self, pred, label, **kwargs):

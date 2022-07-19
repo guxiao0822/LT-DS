@@ -15,12 +15,12 @@ _C.GPU = '1'
 # ----- DATASET SETTINGS ------
 _C.DATA = CN()
 _C.DATA.NAME = 'awa2'
-_C.DATA.ROOT = '/data2/xg3417/data/'
-_C.DATA.DOMAIN = 4
+_C.DATA.ROOT = '/home/dev/Data/xiao/data/'
+_C.DATA.DOMAIN = 5
 _C.DATA.CLASS = 50
-_C.DATA.SOURCE = 'HSO'
-_C.DATA.TARGET = 'O'
-_C.DATA.BATCH_SIZE = 2
+_C.DATA.SOURCE = 'HSUV'
+_C.DATA.TARGET = 'HSUVO'
+_C.DATA.BATCH_SIZE = 48
 _C.DATA.NUM_WORKERS = 8
 
 # ----- Augmentations --------
@@ -36,20 +36,19 @@ _C.MODEL.PRETRAIN_FLAG = False
 
 # ----- Loss  --------
 _C.LOSS = CN()
-_C.LOSS.TYPE = 'CE'
-_C.LOSS.PER_DOMAIN_FLAG = False
+_C.LOSS.TYPE = 'BSCE'
+_C.LOSS.PER_DOMAIN_FLAG = True
 
 # ----- Train -----
 _C.TRAIN = CN()
 _C.TRAIN.MAX_EPOCH = 100
 _C.TRAIN.ITER_PER_EPOCH = 101
-_C.TRAIN.PRINT_FREQ = 5
-_C.TRAIN.PRINT_VAL = True
-
+_C.TRAIN.PRINT_FREQ = 10
+_C.TRAIN.PRINT_VAL = False
 ## OPTIMIZER
 _C.TRAIN.OPTIMIZER = CN()
 _C.TRAIN.OPTIMIZER.TYPE = 'sgd'
-_C.TRAIN.OPTIMIZER.BASELR = 0.01
+_C.TRAIN.OPTIMIZER.BASELR = 0.1
 _C.TRAIN.OPTIMIZER.MOMENTUM = 0.9
 _C.TRAIN.OPTIMIZER.WEIGHT_DECAY = 1e-4
 
@@ -87,7 +86,7 @@ _C.W.S2V = 0.1
 _C.W.AUG = 0.1
 _C.W.V2S_M = 0.1
 _C.W.AUG_M = 0.1
-_C.W.VAL = 0.1
+_C.W.VAL = 0.3
 
 def update_config(cfg, args):
     cfg.defrost()

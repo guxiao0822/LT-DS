@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="Copy of project-level server 'Caliburn'" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="dev@192.168.1.209:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="Copy of project-level server 'Caliburn'">
+      <paths name="dev@192.168.1.209:22 password">
         <serverdata>
           <mappings>
-            <mapping deploy="/data2/xg3417/software/LT-DS" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/dev/Data/xiao/software/lt-ds" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="imr">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

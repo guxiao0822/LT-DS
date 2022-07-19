@@ -81,9 +81,25 @@ class Trainer:
         self.best_test_unseen_acc = 0. # just for monitoring, not for selecting best models
 
         # Start Training
+        print('Start Training')
         for epoch in range(self.cfg.TRAIN.MAX_EPOCH):
             self.train_one_epoch(epoch)
-            self.val_one_epoch(epoch)
+            print('Validation Set')
+            val_acc = self.val_one_epoch(epoch)
+            print('Test Set')
+            test_acc, test_unseen_acc  = self.test_one_epoch(epoch)
+
+            if val_acc > self.best_val_acc:
+                print('\033[92m' + 'Val Current best acc' + '\033[0m')
+                self.best_val_acc = max(val_acc, self.best_val_acc)
+
+            if test_acc > self.best_test_acc:
+                print('\033[92m' + 'Test Current best acc' + '\033[0m')
+                self.best_test_acc = max(test_acc, self.best_test_acc)
+
+            if test_unseen_acc > self.best_test_unseen_acc:
+                print('\033[92m' + 'Test Unseen Current best acc' + '\033[0m')
+                self.best_test_unseen_acc = max(test_unseen_acc, self.best_test_unseen_acc)
 
 
     def train_one_epoch(self, epoch):
@@ -211,8 +227,8 @@ class Trainer:
                                                            self.loss_f[domain_split[-1]])
             if epoch >= self.cfg.AUG.EPOCH:
                 meta_aug_loss = self.loss_aug_f(self.model, f_s, y_s, tgt_s,
-                                                self.cfg.AUG.LAM * (epoch - self.cfg.EPOCH_Aug) / (
-                                                                self.cfg.MAX_EPOCH - self.cfg.EPOCH_Aug),
+                                                self.cfg.AUG.LAM * (epoch - self.cfg.AUG.EPOCH) / (
+                                                                self.cfg.TRAIN.MAX_EPOCH - self.cfg.AUG.EPOCH),
                                                 self.loss_f[domain_split[-1]])
             else:
                 meta_aug_loss = torch.FloatTensor([0.]).cuda()
@@ -243,7 +259,7 @@ class Trainer:
             if i % self.cfg.TRAIN.PRINT_FREQ == 0:
                 progress.display(i)
 
-    def val_one_epoch(self , epoch):
+    def val_one_epoch(self, epoch):
         # metric meter
         metric_meter = MeanTopKRecallMeter_domain(num_domain=self.cfg.DATA.DOMAIN-1, num_classes=self.cfg.DATA.CLASS)
 
@@ -278,6 +294,47 @@ class Trainer:
 
         if self.cfg.TRAIN.PRINT_VAL:
             metric_meter.domain_class_aware_recall()
+
+        return metric_meter.domain_mean_acc()
+
+
+    def test_one_epoch(self, epoch):
+        # metric meter
+        metric_meter = MeanTopKRecallMeter_domain(num_domain=self.cfg.DATA.DOMAIN, num_classes=self.cfg.DATA.CLASS)
+
+        f_all = []
+        d_all = []
+        x_all = []
+        y_all = []
+        tgt_all = []
+
+        for weight in self.model.parameters():
+            weight.fast = None
+
+        self.model.eval()
+
+        for domain, test_loader in enumerate(self.test_data):
+            for i, (x_s, tgt_s, _) in enumerate(test_loader):
+                x_s = x_s.cuda()
+                tgt_s = tgt_s.cuda()
+
+                ## compute output
+                with torch.no_grad():
+                    y_s, f_s = self.model(x_s)
+
+                metric_meter.add(y_s.cpu().data.numpy(),
+                                 tgt_s.cpu().data.numpy(),
+                                 domain * torch.ones_like(tgt_s).cpu().data.numpy())
+
+            # cls_acc = accuracy(y_s_all, tgt_s_all)[0]
+            print('domain %d acc %.3f.' % (domain, metric_meter.domain_aware_acc(domain)))
+
+        print('Mean Test acc %.3f. [%.3f]' % (metric_meter.domain_mean_acc(), max(metric_meter.domain_mean_acc(), self.best_test_acc)))
+
+        if self.cfg.TRAIN.PRINT_VAL:
+            metric_meter.domain_class_aware_recall()
+
+        return metric_meter.domain_mean_acc(), metric_meter.domain_aware_acc(domain)
 
 if __name__ == '__main__':
     trainer = Trainer()
