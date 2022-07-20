@@ -44,8 +44,8 @@ class Trainer:
         self.get_trial()
 
     def get_trial(self):
-        self.trial_name = "{}" \
-            .format(self.cfg.NAME)
+        self.trial_name = "{}_{}_{}" \
+            .format(self.cfg.NAME, self.cfg.DATA.NAME, self.cfg.DATA.SOURCE)
 
         if os.path.isabs(self.cfg.OUTPUT_DIR):
             self.savedir = self.cfg.OUTPUT_DIR

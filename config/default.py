@@ -18,8 +18,8 @@ _C.DATA.NAME = 'awa2'
 _C.DATA.ROOT = '/home/dev/Data/xiao/data/'
 _C.DATA.DOMAIN = 5
 _C.DATA.CLASS = 50
-_C.DATA.SOURCE = 'HSUV'
-_C.DATA.TARGET = 'HSUVO'
+_C.DATA.SOURCE = 'SHUV'
+_C.DATA.TARGET = 'SUVHO'
 _C.DATA.BATCH_SIZE = 48
 _C.DATA.NUM_WORKERS = 8
 
@@ -30,7 +30,7 @@ _C.AUGMENTATION.FLAG = False
 # ----- Models -------
 _C.MODEL = CN()
 _C.MODEL.NAME = 'sfsc_meta'
-_C.MODEL.F = 'resnet18'
+_C.MODEL.F = 'resnet10'
 _C.MODEL.C = 'fc'
 _C.MODEL.PRETRAIN_FLAG = False
 

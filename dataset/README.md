@@ -81,7 +81,7 @@ Change REPO with this repo path, DATA with DATA folder path
 git clone https://github.com/Yijunmaverick/CartoonGAN-Test-Pytorch-Torch
 cd CartoonGAN-Test-Pytorch-Torch
 source pretrained_model/download_pth.sh
-cp REPO/data/transfer_hs.py .
+cp REPO/dataset/transfer_hs.py .
 python transfer_hs.py --dataset awa2 --datapath DATA --style Hayao
 ```
 
@@ -91,7 +91,7 @@ git clone https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
 cd pytorch-CycleGAN-and-pix2pix
 source ./scripts/download_cyclegan_model.sh style_vangogh 
 source ./scripts/download_cyclegan_model.sh style_ukiyoe 
-cp REPO/data/transfer_vu.py .
+cp REPO/dataset/transfer_vu.py .
 python transfer_vu.py --dataset imagenet --datapath DATA --style vangogh --dataroot . --name style_vangogh --model test
 ```
 
