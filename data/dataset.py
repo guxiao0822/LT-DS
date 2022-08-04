@@ -1,6 +1,8 @@
 import os
 from .imagelist import ImageList
 
+# TODO: add PACS dataset
+
 class ltds_dataset(ImageList):
     def __init__(self, root, domain, filter_class=None, split='test', **kwargs):
         if split == 'train':

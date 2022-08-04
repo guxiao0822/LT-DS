@@ -2,19 +2,26 @@ import random
 import torch
 import torch.backends.cudnn as cudnn
 
+from config import config_parser, cfg, update_config
 import os
+args = config_parser.parse_args()
+update_config(cfg, args)
+os.environ["CUDA_VISIBLE_DEVICES"] = cfg.GPU
+
 import numpy as np
 
 from utils import AverageMeter, Accuracy, ProgressMeter, MeanTopKRecallMeter_domain, \
     Prototype, ISDALoss
 
-from config import config_parser, cfg, update_config
 from utils import get_data, get_model, get_loss
+
+# TODO: add evaluation metrics
+# TODO: add model
 
 class Trainer:
     def __init__(self):
-        args = config_parser.parse_args()
-        update_config(cfg, args)
+        # args = config_parser.parse_args()
+        # update_config(cfg, args)
         self.cfg = cfg
 
         self.device = torch.device("cuda")
@@ -335,6 +342,9 @@ class Trainer:
             metric_meter.domain_class_aware_recall()
 
         return metric_meter.domain_mean_acc(), metric_meter.domain_aware_acc(domain)
+
+    # def evaluation(self):
+
 
 if __name__ == '__main__':
     trainer = Trainer()
