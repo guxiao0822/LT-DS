@@ -36,7 +36,7 @@ python train/trainer.py --cfg config/exp/imagenet.yaml
 
 ## TODO
 - [x] Add requirements
-- [ ] Add evaluation scripts
+- [x] Add evaluation scripts
 - [ ] Add imbalanced Bbselines
 
 

@@ -3,12 +3,14 @@ import _init_paths
 import random
 import torch
 import torch.backends.cudnn as cudnn
+import torch.nn.functional as F
 
 from config import config_parser, cfg, update_config
 import os
 args = config_parser.parse_args()
 update_config(cfg, args)
 os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.GPU)
+from os import path as osp
 
 import numpy as np
 
@@ -55,13 +57,15 @@ class Trainer:
         self.trial_name = "{}_{}_{}" \
             .format(self.cfg.NAME, self.cfg.DATA.NAME, self.cfg.DATA.SOURCE)
 
-        if os.path.isabs(self.cfg.OUTPUT_DIR):
-            self.savedir = self.cfg.OUTPUT_DIR
-        else:
-            self.savedir = '../' + self.cfg.OUTPUT_DIR
+        this_dir = osp.dirname(__file__)
+        self.savedir = this_dir + '/../' + self.cfg.OUTPUT_DIR
+        # if os.path.isabs(self.cfg.OUTPUT_DIR):
+        #     self.savedir = self.cfg.OUTPUT_DIR
+        # else:
+        #     self.savedir = '../' + self.cfg.OUTPUT_DIR
 
-        if not os.path.isdir(self.savedir):
-            os.makedirs(self.savedir)
+        # if not os.path.isdir(self.savedir):
+        os.makedirs(self.savedir, exist_ok=True)
 
         with open(self.savedir + self.trial_name + ".yaml", "w") as f:
             f.write(cfg.dump())  # save config to file
@@ -76,8 +80,8 @@ class Trainer:
             'optimizer': self.optimizer.state_dict(),
         }, self.savedir + self.trial_name + ".pth")
 
-    def resume_model(self):
-        checkpoint = torch.load('../checkpoint/' + self.trial_name + ".pth")
+    def resume_model(self, postfix=''):
+        checkpoint = torch.load(self.savedir + self.trial_name + postfix + ".pth")
         self.model.load_state_dict(checkpoint['state_dict'], strict=True)
         self.scheduler.load_state_dict(checkpoint['scheduler'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
@@ -100,6 +104,7 @@ class Trainer:
             if val_acc > self.best_val_acc:
                 print('\033[92m' + 'Val Current best acc' + '\033[0m')
                 self.best_val_acc = max(val_acc, self.best_val_acc)
+                self.save_model(epoch, self.best_test_acc)
 
             if test_acc > self.best_test_acc:
                 print('\033[92m' + 'Test Current best acc' + '\033[0m')
@@ -344,9 +349,94 @@ class Trainer:
 
         return metric_meter.domain_mean_acc(), metric_meter.domain_aware_acc(domain)
 
-    # def evaluation(self):
+    def evaluation(self):
+        # get the best model
+        self.resume_model()
 
+        # set to evaluation mode
+        for weight in self.model.parameters():
+            weight.fast = None
+
+        self.model.eval()
+
+        # get the unique class of the held-out domain
+        full_labelset = [i for i in range(self.cfg.DATA.CLASS)]
+        label_set = []
+        for dataloader in self.train_data:
+            train_label = dataloader.data_loader.dataset.label
+            label_set.append(train_label)
+        train_labelset = np.concatenate(label_set)
+        unique_class = list(set(full_labelset) - set(train_labelset))[0]
+
+        # accumulate result
+        x_s_all = []
+        y_s_all = []
+        tgt_s_all = []
+        d_s_all = []
+
+        unique_indicator = []
+        metric_meter = MeanTopKRecallMeter_domain(num_classes=self.cfg.DATA.CLASS, num_domain=len(self.test_data))
+
+        for domain, test_loader in enumerate(self.test_data):
+            # x_s_all = []
+            # y_s_all = []
+            # tgt_s_all = []
+            for i, (x_s, tgt_s, _) in enumerate(test_loader):
+                x_s = x_s.cuda()
+                tgt_s = tgt_s.cuda()
+
+                ## compute output
+                with torch.no_grad():
+                    y_s, f_s = self.model(x_s)
+
+                x_s_all.append(x_s.cpu().data.numpy())
+                y_s_all.append(F.softmax(y_s, -1).cpu().data.numpy())
+                tgt_s_all.append(tgt_s.cpu().data.numpy())
+                d_s_all.append((domain * torch.ones_like(tgt_s)).cpu().data.numpy())
+                unique_indicator.append((tgt_s != unique_class).cpu().data.numpy())
+
+                if sum(tgt_s != unique_class) > 0:
+                    y_s_filter = y_s[tgt_s != unique_class].cpu().data.numpy()
+                    tgt_s_filter = tgt_s[tgt_s != unique_class].cpu().data.numpy()
+                    metric_meter.add(y_s_filter,
+                                     tgt_s_filter,
+                                     domain * np.ones_like(tgt_s_filter))
+
+            print('domain %d acc %.3f.' % (domain, metric_meter.domain_aware_acc(domain)))
+        # generate metric
+
+        print('Mean validation acc %.3f.' % metric_meter.domain_mean_acc())
+
+        y_s_all = np.concatenate(y_s_all, axis=0)
+        tgt_s_all = np.concatenate(tgt_s_all, axis=0)
+        #unique_indicator = np.concatenate(unique_indicator, axis=0)
+
+        thd_min = np.min(y_s_all)
+        thd_max = np.max(y_s_all)
+        outlier_range = [thd_min + (thd_max - thd_min) * i / 9 for i in range(10)]
+
+        best_overall_Hscore = 0.0
+        best_thred_Hscore = 0.0
+
+        max_prob = np.max(y_s_all, 1)
+        pred_all = np.argmax(y_s_all, 1)
+
+        for outlier_thred in outlier_range:
+            pred_all[max_prob<outlier_thred] = unique_class
+            insider = sum(pred_all[tgt_s_all!=unique_class]==tgt_s_all[tgt_s_all!=unique_class])/sum(tgt_s_all!=unique_class)
+            outsider = sum(pred_all[tgt_s_all==unique_class]==unique_class) / sum(tgt_s_all==unique_class)
+
+            overall_Hscore = 2.0 * insider * outsider / (insider + outsider)
+
+            if overall_Hscore > best_overall_Hscore:
+                best_overall_Hscore = overall_Hscore
+                best_thred_Hscore = outlier_thred
+
+        print('Best OverallHscore: %.3f' % (best_overall_Hscore), 'Best threshold Hscore: %.3f' % (best_thred_Hscore))
 
 if __name__ == '__main__':
     trainer = Trainer()
-    trainer.train()
+    if trainer.cfg.MODE == 'train':
+        trainer.train()
+    if trainer.cfg.MODE == 'test':
+        trainer.evaluation()
