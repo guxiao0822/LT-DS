@@ -25,19 +25,20 @@ conda env create -f requirement.yml
 ## Training 
 ### AWA2-LTS
 ```commandline
-python train/trainer.py --cfg config/exp/awa2.yaml 
+python train/trainer.py --cfg config/exp/awa2.yaml DATA.SOURCE SHUV DATA.TARGET SHUVO
+python train/trainer.py --cfg config/exp/awa2.yaml DATA.SOURCE SHUV DATA.TARGET SHUVO MODE test
 ```
 
 ### ImageNet-LTS
 ```commandline
-python train/trainer.py --cfg config/exp/imagenet.yaml
+python train/trainer.py --cfg config/exp/imagenet.yaml DATA.SOURCE SHUV DATA.TARGET SHUVO 
+python train/trainer.py --cfg config/exp/imagenet.yaml DATA.SOURCE SHUV DATA.TARGET SHUVO MODE test
 ```
-
 
 ## TODO
 - [x] Add requirements
 - [x] Add evaluation scripts
-- [ ] Add imbalanced Bbselines
+- [ ] Add imbalanced baselines
 
 
 ## Citation
