@@ -10,7 +10,7 @@ _C.NAME = "debug"
 _C.OUTPUT_DIR = 'checkpoint/'
 _C.MODE = 'train'
 _C.SEED = 0
-_C.GPU = '1'
+_C.GPU = 1
 
 # ----- DATASET SETTINGS ------
 _C.DATA = CN()

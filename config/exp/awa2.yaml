@@ -1,0 +1,37 @@
+NAME: awa2-lts-proposed
+GPU: 1
+
+DATA:
+  ROOT: /data2/xg3417/data/
+  NAME: awa2
+
+TRAIN:
+  MAX_EPOCH: 100
+  ITER_PER_EPOCH: 48
+  OPTIMIZER:
+    BASELR: 0.1
+
+EMBED:
+  FLAG: True
+  MARGIN: 0.1
+  SCALE: 30.
+
+AUG:
+  FLAG: True
+  EPOCH: 40
+  LAM: 10.
+
+META:
+  FLAG: True
+  META_STEP_SIZE: 0.2
+
+W:
+  V2S: 0.1
+  S2S: 0.1
+  S2V: 0.1
+  AUG: 0.1
+  V2S_M: 0.1
+  AUG_M: 0.1
+  VAL: 0.3
+
+

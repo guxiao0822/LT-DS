@@ -1,16 +1,15 @@
 # LT-DS
 [**ECCV 2022**] Repo for our paper "**Tackling Long-Tailed Category Distribution Under Domain Shifts**" 
 
-[[project]](https://xiaogu.site/LTDS) [[dataset]](./dataset/) [[paper]](http://arxiv.org/abs/2207.10150)
+[[project](https://xiaogu.site/LTDS)] [[dataset](./dataset/)] [[paper](http://arxiv.org/abs/2207.10150)]
 
 <p align="center"><img src="misc/figure1.jpg" alt="figure1" width=90%/></p>
 
 
 ## Dataset 
-We provided two datasets for benchmarking LT-DS (Long-Tailed Under Domain shifts) algorithms. 
+We provide two datasets for benchmarking LT-DS (Long-Tailed Under Domain shifts) algorithms. 
 Due to the license issue, we only provided instructions on how to create the corresponding datasets. 
 Please follow [here](./dataset/).
-
 
 ## Training 
 ### AWA2-LTS
@@ -26,8 +25,7 @@ python train/trainer.py --cfg config/exp/imagenet.yaml
 
 ## TODO
 - [ ] Add evaluation scripts
-- [ ] Add requirements
-- [ ] Add PACS-ODG experiments
+- [x] Add requirements
 - [ ] Add Imbalanced Baselines
 
 
@@ -44,5 +42,5 @@ If you find our paper/code useful, please consider citing:
 
 ## Acknowledgement
 Our codes are inspired by the following repos:
-[[OpenDG-DAML]](https://github.com/thuml/OpenDG-DAML) [[BagofTricks-LT
-]](https://github.com/zhangyongshun/BagofTricks-LT) [[ISDA]](https://github.com/blackfeather-wang/ISDA-for-Deep-Networks).
+[[OpenDG-DAML](https://github.com/thuml/OpenDG-DAML)] [[BagofTricks-LT
+](https://github.com/zhangyongshun/BagofTricks-LT)] [[ISDA](https://github.com/blackfeather-wang/ISDA-for-Deep-Networks)].

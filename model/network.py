@@ -3,7 +3,7 @@ from config import config_parser, cfg, update_config
 
 args = config_parser.parse_args()
 update_config(cfg, args)
-os.environ["CUDA_VISIBLE_DEVICES"] = cfg.GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.GPU)
 
 import torch
 from torch import nn

@@ -1,3 +1,5 @@
+import _init_paths
+
 import random
 import torch
 import torch.backends.cudnn as cudnn
@@ -6,7 +8,7 @@ from config import config_parser, cfg, update_config
 import os
 args = config_parser.parse_args()
 update_config(cfg, args)
-os.environ["CUDA_VISIBLE_DEVICES"] = cfg.GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.GPU)
 
 import numpy as np
 
@@ -16,7 +18,6 @@ from utils import AverageMeter, Accuracy, ProgressMeter, MeanTopKRecallMeter_dom
 from utils import get_data, get_model, get_loss
 
 # TODO: add evaluation metrics
-# TODO: add model
 
 class Trainer:
     def __init__(self):
