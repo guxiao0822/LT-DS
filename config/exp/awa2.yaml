@@ -4,10 +4,10 @@ GPU: 1
 DATA:
   ROOT: /data2/xg3417/data/
   NAME: awa2
+  BATCH_SIZE: 48
 
 TRAIN:
   MAX_EPOCH: 100
-  ITER_PER_EPOCH: 48
   OPTIMIZER:
     BASELR: 0.1
 
