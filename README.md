@@ -3,13 +3,24 @@
 
 [[project](https://xiaogu.site/LTDS)] [[dataset](./dataset/)] [[paper](http://arxiv.org/abs/2207.10150)]
 
-<p align="center"><img src="misc/figure1.jpg" alt="figure1" width=90%/></p>
+<p align="center"><img src="misc/eccv2022_gif.gif" alt="figure1" width=100%/></p>
 
+## Abstract
+Machine learning models fail to perform well on real-world applications when 
+1) <span style="color:darkred">**LT**</span>: the category distribution P(Y) of the training dataset suffers from long-tailed distribution; 
+2) <span style="color:darkgreen">**DS**</span>: the test data is drawn from different conditional distributions P(X|Y). 
+
+Existing approaches cannot handle the scenario where both issues exist, which however is common for real-world applications. In this study, we took a step forward and looked into the problem of long-tailed classification under domain shifts. By taking both the categorical distribution bias and conditional distribution shifts into account, we designed three novel core functional blocks including Distribution Calibrated Classification Loss, Visual-Semantic Mapping and Semantic-Similarity Guided Augmentation. Furthermore, we adopted a meta-learning framework which integrates the three blocks to improve domain generalization on unseen target domains.
 
 ## Dataset 
-We provide two datasets for benchmarking LT-DS (Long-Tailed Under Domain shifts) algorithms. 
+We provide two datasets for benchmarking <span style="color:darkred">**LT**</span>-<span style="color:darkgreen">**DS**</span> (Long-Tailed Under Domain shifts) algorithms. 
 Due to the license issue, we only provided instructions on how to create the corresponding datasets. 
 Please follow [here](./dataset/).
+
+## Install Env 
+```commandline
+conda env create -f requirement.yml
+```
 
 ## Training 
 ### AWA2-LTS
@@ -24,9 +35,9 @@ python train/trainer.py --cfg config/exp/imagenet.yaml
 
 
 ## TODO
-- [ ] Add evaluation scripts
 - [x] Add requirements
-- [ ] Add Imbalanced Baselines
+- [ ] Add evaluation scripts
+- [ ] Add imbalanced Bbselines
 
 
 ## Citation
